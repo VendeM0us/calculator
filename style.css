@@ -1,3 +1,10 @@
+:root {
+  --light-gray: #D4D4D2;
+  --eerie-black: #1C1C1C;
+  --dark-liver: #505050;
+  --vivid-gamboge: #FF9500;
+}
+
 * {
   padding: 0;
   margin: 0;
@@ -9,6 +16,49 @@ html {
   font-weight: 300;
   width: auto;
   height: 100vh;
+  background: var(--eerie-black);
+}
+
+body {
+  height: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
+  border: none;
+  border-radius: 50%;
+  height: 80px;
+  min-width: 80px;
+  font-size: 32px;
+  cursor: pointer;
+  color: white;
+}
+
+#calculator {
+  height: fit-content;
+  width: fit-content;
+  margin: auto;
+  color: var(--light-gray);
+}
+
+#screen {
+  padding: 0 16px 16px;
+}
+#smaller-text {
+  height: 48px;
+  font-size: 24px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+#bigger-text {
+  height: 48px;
+  font-size: 64px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 #buttons {
@@ -16,6 +66,7 @@ html {
   grid-template-rows: repeat(5, 1fr);
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
+  width: fit-content;
 }
 button[data-key="AC"] {
   grid-area: 1 / 1;
@@ -67,10 +118,37 @@ button[data-key="+"] {
 }
 button[data-key="0"] {
   grid-area: 5 / 1 / 5 / 3;
+  border-radius: 50px;
+  text-align: left;
+  padding: 0 32px;
 }
 button[data-key="."] {
   grid-area: 5 / 3;
 }
 button[data-key="="] {
   grid-area: 5 / 4;
+}
+button.number, button.decimal {
+  background: var(--dark-liver);
+}
+button.reset, button.delete, button.percent {
+  background: var(--light-gray);
+  color: var(--eerie-black);
+}
+button.divide, button.subtract, button.add, button.multiply, button.equal {
+  background: var(--vivid-gamboge);
+}
+
+#bar-container {
+  height: 64px;
+  display: flex;
+  align-items: flex-end;
+}
+#bar {
+  border: solid 2px var(--light-gray);
+  width: 150px;
+  border-radius: 50px;
+  margin: auto;
+  position: relative;
+  bottom: -16px;
 }
