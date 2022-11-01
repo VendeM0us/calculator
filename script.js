@@ -3,33 +3,25 @@ function compute(expression) {
   return computeFromPostfixOrder(postfixOrder);
 }
 
-function add(num1, num2) {
-  return num1 + num2;
-}
-
-function subtract(num1, num2) {
-  return num1 - num2;
-}
-
-function multiply(num1, num2) {
-  return num1 * num2;
-}
-
-function divide(num1, num2) {
-  return num1 / num2;
-}
-
 function operate(num1, num2, operator) {
+  let result;
+
   switch (operator) {
     case '+':
-      return add(num1, num2);
+      result = num1 + num2;
+      break;
     case '-':
-      return subtract(num1, num2);
+      result = num1 - num2;
+      break;
     case '*':
-      return multiply(num1, num2);
+      result = num1 * num2;
+      break;
     case '/':
-      return divide(num1, num2);
+      result = num1 / num2;
+      break;
   }
+
+  return precise(result);
 }
 
 function computeFromPostfixOrder(postfixOrder) {
@@ -44,39 +36,11 @@ function computeFromPostfixOrder(postfixOrder) {
       const num2 = stack.pop();
       const num1 = stack.pop();
       const result = operate(num1, num2, ele);
-      const precise = result.toPrecision(12);
-      stack.push(Number(precise));
+      stack.push(result);
     }
   }
 
   return stack[0];
-}
-
-function toNumber(str) {
-  if (str.includes("%")) {
-    const toDecimal = Number(str.slice(0, str.length - 1)) * 0.01;
-    const precise = toDecimal.toPrecision(12);
-    return Number(precise);
-  } else if (parseInt(str) === Number(str)) {
-    return Number(str);
-  } else {
-    const precise = parseFloat(str).toPrecision(12);
-    return Number(precise);
-  }
-}
-
-function precedence(operator) {
-  switch (operator) {
-    case '*': 
-    case '/': return 2;
-    case '+':
-    case '-': return 1;
-  }
-}
-
-function isOperand(ele) {
-  const operators = "*/+-";
-  return !operators.includes(ele);
 }
 
 function translateToPostfixOrder(expression) {
@@ -100,6 +64,37 @@ function translateToPostfixOrder(expression) {
   while(stack.length !== 0) postfixOrder.push(stack.pop());
 
   return postfixOrder;
+}
+
+function precedence(operator) {
+  switch (operator) {
+    case '*': 
+    case '/': return 2;
+    case '+':
+    case '-': return 1;
+  }
+}
+
+function isOperand(ele) {
+  const operators = "*/+-";
+  return !operators.includes(ele);
+}
+
+function precise(num) {
+  const toPrecised = num.toFixed(12);
+  return Number(toPrecised);
+}
+
+function toNumber(str) {
+  if (str.includes("%")) {
+    const toDecimal = Number(str.slice(0, str.length - 1)) * 0.01;
+    return precise(toDecimal);
+  } else if (parseInt(str) === Number(str)) {
+    return Number(str);
+  } else {
+    const toDecimal = parseFloat(str);
+    return precise(toDecimal);
+  }
 }
 
 function getClassNameBySymbol(symbol) {
@@ -144,4 +139,4 @@ function createButtons() {
 
 window.addEventListener("DOMContentLoaded", event => {
   createButtons();
-})
+});
