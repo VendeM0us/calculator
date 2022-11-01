@@ -44,21 +44,28 @@ button {
 }
 
 #screen {
+  max-width: 350px;
+  margin: auto;
   padding: 0 16px 16px;
 }
 #smaller-text {
+  color: var(--dark-liver);
   height: 48px;
   font-size: 24px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
 }
 #bigger-text {
   height: 48px;
-  font-size: 64px;
+  font-size: 48px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 #buttons {

@@ -1,3 +1,7 @@
+let expression = "";
+const specialNums = ["%", "."];
+const operators = ["+", "-", "*", "/"];
+
 function compute(expression) {
   const postfixOrder = translateToPostfixOrder(expression);
   return computeFromPostfixOrder(postfixOrder);
@@ -102,11 +106,11 @@ function getClassNameBySymbol(symbol) {
     case 'AC': return 'reset';
     case 'C': return 'delete';
     case '%': return 'percent';
-    case '/': return 'divide';
-    case 'x': return 'multiply';
+    case '.': return 'decimal';
+    case '/': return 'add';
+    case '*': return 'multiply';
     case '-': return 'subtract';
     case '+': return 'add';
-    case '.': return 'decimal';
     case '=': return 'equal';
   }
 }
@@ -122,12 +126,20 @@ function createNumButtons() {
 }
 
 function createSymbolButtons() {
-  const symbols = ['AC', 'C', '%', '/', 'x', '-', '+', '.', '='];
+  const symbols = ['AC', 'C', '%', '/', '*', '-', '+', '.', '='];
   symbols.forEach(symbol => {
     const symbolButton = document.createElement("button");
     symbolButton.classList.add(getClassNameBySymbol(symbol));
     symbolButton.dataset.key = symbol;
-    symbol === '/' ? symbolButton.innerText = '÷' : symbolButton.innerText = symbol;
+
+    if (symbol === '/') {
+      symbolButton.innerText = "÷";
+    } else if (symbol === '*') {
+      symbolButton.innerText = 'x';
+    } else {
+      symbolButton.innerText = symbol;
+    }
+
     document.getElementById("buttons").appendChild(symbolButton);
   });
 }
@@ -137,6 +149,108 @@ function createButtons() {
   createSymbolButtons();
 }
 
+function decimalEnteredOnce() {
+  const parts = expression.split(" ");
+  const lastArgument = parts[parts.length - 1];
+
+  for (let i = 0; i < lastArgument.length; i++) {
+    if (lastArgument[i] === ".") return true;
+  }
+
+  return false;
+}
+
+function hasNoOperator() {
+  const parts = expression.split(" ");
+  return (parts.length <= 1 && !parts[0].includes("%"));
+}
+
+function updateScreen() {
+  const screen = document.getElementById("bigger-text");
+  screen.innerText = expression
+    .replaceAll("/", "÷")
+    .replaceAll("*", "x")
+    .trimEnd();
+}
+
+function handleNumKeys(event) {
+  if (expression[expression.length - 1] === "%") return;
+
+  const number = event.target.dataset.key;
+  expression += number;
+  updateScreen();
+}
+
+function handleSpecialNumKeys(event) {
+  const key = event.target.dataset.key;
+
+  if (key === "%" && expression.length === 0 
+    || specialNums.includes(expression[expression.length - 1]) 
+    || key === "." && decimalEnteredOnce()) {
+    return;
+  }
+
+  expression += key;
+  updateScreen();
+}
+
+function handleOperatorKey(event) {
+  const operator = event.target.dataset.key;
+
+  if (expression.length === 0 || operators.includes(expression[expression.length - 2])) {
+    return;
+  }
+
+  expression += ` ${operator} `;
+  updateScreen();
+}
+
+function handleEqualButton() {
+  if (operators.includes(expression[expression.length - 2]) || hasNoOperator()) {
+    return;
+  }
+
+  const result = compute(expression);
+  expression = result.toString();
+  updateScreen();
+}
+
+function handleDelete() {
+  const endIndex = expression[expression.length - 1] === " " 
+    ? expression.length - 2 
+    : expression.length - 1
+    
+  expression = expression.slice(0, endIndex);
+  updateScreen();
+}
+
+function handleReset() {
+  expression = "";
+  updateScreen();
+}
+
 window.addEventListener("DOMContentLoaded", event => {
   createButtons();
+
+  const numKeys = document.querySelectorAll("button.number");
+  numKeys.forEach(numKey => numKey.addEventListener("click", handleNumKeys));
+
+  specialNums.forEach(specialNum => {
+    const buttonRef = document.querySelector(`button[data-key="${specialNum}"]`);
+    buttonRef.addEventListener("click", handleSpecialNumKeys);
+  });
+
+  const deleteBtn = document.querySelector("button.delete");
+  deleteBtn.addEventListener("click", handleDelete);
+
+  const resetBtn = document.querySelector("button.reset");
+  resetBtn.addEventListener("click", handleReset);
+
+  operators.forEach(operator => {
+    const buttonRef = document.querySelector(`button[data-key="${operator}"]`);
+    buttonRef.addEventListener("click", handleOperatorKey);
+  });
+
+  const equalBtn = document.querySelector("button.equal");
+  equalBtn.addEventListener("click", handleEqualButton);
 });
