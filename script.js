@@ -1,4 +1,5 @@
 let expression = "";
+let allowMiniScreenUpdate = false;
 const specialNums = ["%", "."];
 const operators = ["+", "-", "*", "/"];
 
@@ -90,13 +91,12 @@ function precise(num) {
 }
 
 function toNumber(str) {
-  if (str.includes("%")) {
-    const toDecimal = Number(str.slice(0, str.length - 1)) * 0.01;
-    return precise(toDecimal);
-  } else if (parseInt(str) === Number(str)) {
+  if (parseInt(str) === Number(str)) {
     return Number(str);
   } else {
-    const toDecimal = parseFloat(str);
+    const toDecimal = str.includes("%")
+    ? Number(str.slice(0, str.length - 1)) * 0.01
+    : parseFloat(str);
     return precise(toDecimal);
   }
 }
@@ -113,6 +113,114 @@ function getClassNameBySymbol(symbol) {
     case '+': return 'add';
     case '=': return 'equal';
   }
+}
+
+function decimalEnteredOnce() {
+  const parts = expression.split(" ");
+  const lastArgument = parts[parts.length - 1];
+
+  for (let i = 0; i < lastArgument.length; i++) {
+    if (lastArgument[i] === ".") return true;
+  }
+
+  return false;
+}
+
+function hasNoOperator() {
+  const parts = expression.split(" ");
+  return (parts.length <= 1 && !parts[0].includes("%"));
+}
+
+function updateScreen() {
+  const screen = document.getElementById("bigger-text");
+  screen.innerText = expression
+    .replaceAll("/", "÷")
+    .replaceAll("*", "x")
+    .trimEnd();
+}
+
+function updateMiniScreen() {
+  if (!allowMiniScreenUpdate) return false;
+
+  const miniScreen = document.getElementById("smaller-text");
+  const bigScreenTextHistory = document.getElementById("bigger-text").textContent;
+  isNaN(Number(bigScreenTextHistory))
+    ? miniScreen.innerText = bigScreenTextHistory
+    : miniScreen.innerText = "Ans = " + bigScreenTextHistory;
+}
+
+function handleNumKeys(event) {
+  if (expression[expression.length - 1] === "%") return;
+
+  updateMiniScreen();
+  allowMiniScreenUpdate = false;
+  const number = event.target.dataset.key;
+  expression += number;
+  updateScreen();
+}
+
+function handleSpecialNumKeys(event) {
+  const key = event.target.dataset.key;
+  const percentagePlacedAfterOperator = key === "%" && operators.includes(expression[expression.length - 2]);
+  const percentagePlacedOnEmptyExpression = key === "%" && expression.length === 0;
+  const lastInputIsSpecialNumber = specialNums.includes(expression[expression.length - 1]);
+  const invalidDecimalPlacement = key === "." && decimalEnteredOnce();
+
+  if ( percentagePlacedAfterOperator || percentagePlacedOnEmptyExpression
+    || lastInputIsSpecialNumber || invalidDecimalPlacement)  {
+    return;
+  }
+
+  updateMiniScreen();
+  allowMiniScreenUpdate = false;
+  expression += key;
+  updateScreen();
+}
+
+function handleOperatorKey(event) {
+  const operator = event.target.dataset.key;
+
+  if (expression.length === 0 || operators.includes(expression[expression.length - 2])) {
+    return;
+  }
+
+  updateMiniScreen();
+  allowMiniScreenUpdate = false;
+  expression += ` ${operator} `;
+  updateScreen();
+}
+
+function handleEqualButton() {
+  if (operators.includes(expression[expression.length - 2]) || hasNoOperator()) {
+    return;
+  }
+
+  allowMiniScreenUpdate = true;
+  const result = compute(expression);
+  updateMiniScreen();
+
+  expression = result.toString();
+  updateScreen();
+  
+  expression = "";
+}
+
+function handleDelete() {
+  const endIndex = expression[expression.length - 1] === " " 
+    ? expression.length - 2 
+    : expression.length - 1
+
+  updateMiniScreen();
+  allowMiniScreenUpdate = false;
+  expression = expression.slice(0, endIndex);
+  updateScreen();
+}
+
+function handleReset() {
+  updateMiniScreen();
+  allowMiniScreenUpdate = false;
+  expression = "";
+  updateScreen();
 }
 
 function createNumButtons() {
@@ -147,86 +255,6 @@ function createSymbolButtons() {
 function createButtons() {
   createNumButtons();
   createSymbolButtons();
-}
-
-function decimalEnteredOnce() {
-  const parts = expression.split(" ");
-  const lastArgument = parts[parts.length - 1];
-
-  for (let i = 0; i < lastArgument.length; i++) {
-    if (lastArgument[i] === ".") return true;
-  }
-
-  return false;
-}
-
-function hasNoOperator() {
-  const parts = expression.split(" ");
-  return (parts.length <= 1 && !parts[0].includes("%"));
-}
-
-function updateScreen() {
-  const screen = document.getElementById("bigger-text");
-  screen.innerText = expression
-    .replaceAll("/", "÷")
-    .replaceAll("*", "x")
-    .trimEnd();
-}
-
-function handleNumKeys(event) {
-  if (expression[expression.length - 1] === "%") return;
-
-  const number = event.target.dataset.key;
-  expression += number;
-  updateScreen();
-}
-
-function handleSpecialNumKeys(event) {
-  const key = event.target.dataset.key;
-
-  if (key === "%" && expression.length === 0 
-    || specialNums.includes(expression[expression.length - 1]) 
-    || key === "." && decimalEnteredOnce()) {
-    return;
-  }
-
-  expression += key;
-  updateScreen();
-}
-
-function handleOperatorKey(event) {
-  const operator = event.target.dataset.key;
-
-  if (expression.length === 0 || operators.includes(expression[expression.length - 2])) {
-    return;
-  }
-
-  expression += ` ${operator} `;
-  updateScreen();
-}
-
-function handleEqualButton() {
-  if (operators.includes(expression[expression.length - 2]) || hasNoOperator()) {
-    return;
-  }
-
-  const result = compute(expression);
-  expression = result.toString();
-  updateScreen();
-}
-
-function handleDelete() {
-  const endIndex = expression[expression.length - 1] === " " 
-    ? expression.length - 2 
-    : expression.length - 1
-    
-  expression = expression.slice(0, endIndex);
-  updateScreen();
-}
-
-function handleReset() {
-  expression = "";
-  updateScreen();
 }
 
 window.addEventListener("DOMContentLoaded", event => {

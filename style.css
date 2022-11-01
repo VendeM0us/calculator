@@ -50,7 +50,7 @@ button {
 }
 #smaller-text {
   color: var(--dark-liver);
-  height: 48px;
+  height: 32px;
   font-size: 24px;
   display: flex;
   justify-content: flex-end;
@@ -59,8 +59,8 @@ button {
   white-space: nowrap;
 }
 #bigger-text {
-  height: 48px;
-  font-size: 48px;
+  height: 64px;
+  font-size: 64px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
