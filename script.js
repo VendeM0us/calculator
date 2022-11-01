@@ -231,6 +231,20 @@ function handleReset() {
   updateScreen();
 }
 
+function keyboardShortcuts(event) {
+  let key = event.key;
+  if (key === "Enter") {
+    key = "=";
+  } else if (key === "Backspace") {
+    key = "C";
+  }
+
+  const button = document.querySelector(`button[data-key="${key}"]`);
+  if (!button) return;
+  
+  button.click();
+}
+
 function createNumButtons() {
   for (let numKey = 0; numKey <= 9; numKey++) {
     const numButton = document.createElement("button");
@@ -289,4 +303,6 @@ window.addEventListener("DOMContentLoaded", event => {
 
   const equalBtn = document.querySelector("button.equal");
   equalBtn.addEventListener("click", handleEqualButton);
+
+  window.addEventListener("keydown", keyboardShortcuts);
 });
