@@ -161,6 +161,10 @@ function handleNumKeys(event) {
 
 function handleSpecialNumKeys(event) {
   const key = event.target.dataset.key;
+  if (allowMiniScreenUpdate && key === "%") {
+    expression = document.getElementById("bigger-text").textContent;
+  }
+
   const percentagePlacedAfterOperator = key === "%" && operators.includes(expression[expression.length - 2]);
   const percentagePlacedOnEmptyExpression = key === "%" && expression.length === 0;
   const lastInputIsSpecialNumber = specialNums.includes(expression[expression.length - 1]);
@@ -178,14 +182,18 @@ function handleSpecialNumKeys(event) {
 }
 
 function handleOperatorKey(event) {
-  const operator = event.target.dataset.key;
+  if (allowMiniScreenUpdate) {
+    expression = document.getElementById("bigger-text").textContent;
+  }
 
+  const operator = event.target.dataset.key;
   if (expression.length === 0 || operators.includes(expression[expression.length - 2])) {
     return;
   }
 
   updateMiniScreen();
   allowMiniScreenUpdate = false;
+
   expression += ` ${operator} `;
   updateScreen();
 }
@@ -201,7 +209,7 @@ function handleEqualButton() {
 
   expression = result.toString();
   updateScreen();
-  
+
   expression = "";
 }
 

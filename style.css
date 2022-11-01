@@ -159,3 +159,10 @@ button.divide, button.subtract, button.add, button.multiply, button.equal {
   position: relative;
   bottom: -16px;
 }
+
+@media (max-width: 370px) {
+  button {
+    min-width: 64px;
+    height: 64px;
+  }
+}
