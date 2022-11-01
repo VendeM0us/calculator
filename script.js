@@ -241,47 +241,11 @@ function keyboardShortcuts(event) {
 
   const button = document.querySelector(`button[data-key="${key}"]`);
   if (!button) return;
-  
+
   button.click();
 }
 
-function createNumButtons() {
-  for (let numKey = 0; numKey <= 9; numKey++) {
-    const numButton = document.createElement("button");
-    numButton.classList.add("number");
-    numButton.dataset.key = numKey;
-    numButton.innerText = numKey;
-    document.getElementById("buttons").appendChild(numButton);
-  }
-}
-
-function createSymbolButtons() {
-  const symbols = ['AC', 'C', '%', '/', '*', '-', '+', '.', '='];
-  symbols.forEach(symbol => {
-    const symbolButton = document.createElement("button");
-    symbolButton.classList.add(getClassNameBySymbol(symbol));
-    symbolButton.dataset.key = symbol;
-
-    if (symbol === '/') {
-      symbolButton.innerText = "÷";
-    } else if (symbol === '*') {
-      symbolButton.innerText = 'x';
-    } else {
-      symbolButton.innerText = symbol;
-    }
-
-    document.getElementById("buttons").appendChild(symbolButton);
-  });
-}
-
-function createButtons() {
-  createNumButtons();
-  createSymbolButtons();
-}
-
 window.addEventListener("DOMContentLoaded", event => {
-  createButtons();
-
   const numKeys = document.querySelectorAll("button.number");
   numKeys.forEach(numKey => numKey.addEventListener("click", handleNumKeys));
 
