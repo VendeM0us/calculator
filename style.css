@@ -165,4 +165,7 @@ button.divide, button.subtract, button.add, button.multiply, button.equal {
     min-width: 64px;
     height: 64px;
   }
+  #screen {
+    max-width: 290px;
+  }
 }
