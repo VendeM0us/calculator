@@ -163,7 +163,7 @@ function clearMiniScreen() {
 }
 
 function handleNumKeys(event) {
-  if (expression[expression.length - 1] === "%" || screen.textContent === errorMessage) return;
+  if (expression[expression.length - 1] === "%") return;
 
   updateMiniScreen();
   allowMiniScreenUpdate = false;
