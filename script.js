@@ -2,6 +2,7 @@ let expression = "";
 let allowMiniScreenUpdate = false;
 const specialNums = ["%", "."];
 const operators = ["+", "-", "*", "/"];
+const errorMessage = "MATH ERROR";
 
 function compute(expression) {
   const postfixOrder = translateToPostfixOrder(expression);
@@ -45,7 +46,11 @@ function computeFromPostfixOrder(postfixOrder) {
     }
   }
 
-  return stack[0];
+  if (stack[0] > -Infinity && stack[0] < Infinity) {
+    return stack[0];
+  } else {
+    return errorMessage;
+  }
 }
 
 function translateToPostfixOrder(expression) {
@@ -86,7 +91,10 @@ function isOperand(ele) {
 }
 
 function precise(num) {
-  const toPrecised = num.toPrecision(12);
+  let toPrecised = num.toFixed(8);
+  if (toPrecised.length >= 12) {
+    toPrecised = parseFloat(toPrecised).toPrecision(11);
+  }
   return Number(toPrecised);
 }
 
@@ -140,10 +148,10 @@ function updateScreen() {
 }
 
 function updateMiniScreen() {
-  if (!allowMiniScreenUpdate) return false;
+  const bigScreenTextHistory = document.getElementById("bigger-text").textContent;
+  if (!allowMiniScreenUpdate || bigScreenTextHistory === errorMessage) return;
 
   const miniScreen = document.getElementById("smaller-text");
-  const bigScreenTextHistory = document.getElementById("bigger-text").textContent;
   isNaN(Number(bigScreenTextHistory))
     ? miniScreen.innerText = bigScreenTextHistory
     : miniScreen.innerText = "Ans = " + bigScreenTextHistory;
@@ -192,7 +200,8 @@ function handleOperatorKey(event) {
   }
 
   const operator = event.target.dataset.key;
-  if (expression.length === 0 || operators.includes(expression[expression.length - 2])) {
+  const alreadyPressedOperator = operators.includes(expression[expression.length - 2]);
+  if (expression.length === 0 || alreadyPressedOperator || expression === errorMessage) {
     return;
   }
 
