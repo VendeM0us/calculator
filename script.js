@@ -1,8 +1,19 @@
 let expression = "";
 let allowMiniScreenUpdate = false;
+const errorMessage = "MATH ERROR";
+
+const screen = document.getElementById("bigger-text");
+const miniScreen = document.getElementById("smaller-text");
+const numKeys = document.querySelectorAll("button.number");
+const deleteBtn = document.querySelector("button.delete");
+const resetBtn = document.querySelector("button.reset");
+const equalBtn = document.querySelector("button.equal");
 const specialNums = ["%", "."];
 const operators = ["+", "-", "*", "/"];
-const errorMessage = "MATH ERROR";
+
+function getButtonByKey(key) {
+  return document.querySelector(`button[data-key="${key}"]`);
+}
 
 function compute(expression) {
   const postfixOrder = translateToPostfixOrder(expression);
@@ -140,7 +151,6 @@ function hasNoOperator() {
 }
 
 function updateScreen() {
-  const screen = document.getElementById("bigger-text");
   screen.innerText = expression
     .replaceAll("/", "÷")
     .replaceAll("*", "x")
@@ -148,22 +158,19 @@ function updateScreen() {
 }
 
 function updateMiniScreen() {
-  const bigScreenTextHistory = document.getElementById("bigger-text").textContent;
-  if (!allowMiniScreenUpdate || bigScreenTextHistory === errorMessage) return;
+  if (!allowMiniScreenUpdate || screen.textContent === errorMessage) return;
 
-  const miniScreen = document.getElementById("smaller-text");
-  isNaN(Number(bigScreenTextHistory))
-    ? miniScreen.innerText = bigScreenTextHistory
-    : miniScreen.innerText = "Ans = " + bigScreenTextHistory;
+  isNaN(Number(screen.textContent))
+    ? miniScreen.innerText = screen.textContent
+    : miniScreen.innerText = "Ans = " + screen.textContent;
 }
 
 function clearMiniScreen() {
-  const miniScreen = document.getElementById("smaller-text");
   miniScreen.innerText = "";
 }
 
 function handleNumKeys(event) {
-  if (expression[expression.length - 1] === "%") return;
+  if (expression[expression.length - 1] === "%" || screen.textContent === errorMessage) return;
 
   updateMiniScreen();
   allowMiniScreenUpdate = false;
@@ -174,8 +181,8 @@ function handleNumKeys(event) {
 
 function handleSpecialNumKeys(event) {
   const key = event.target.dataset.key;
-  if (allowMiniScreenUpdate && key === "%") {
-    expression = document.getElementById("bigger-text").textContent;
+  if (allowMiniScreenUpdate && key === "%" && screen.textContent !== errorMessage) {
+    expression = screen.textContent;
   }
 
   const percentagePlacedAfterOperator = key === "%" && operators.includes(expression[expression.length - 2]);
@@ -184,7 +191,7 @@ function handleSpecialNumKeys(event) {
   const invalidDecimalPlacement = key === "." && decimalEnteredOnce();
 
   if ( percentagePlacedAfterOperator || percentagePlacedOnEmptyExpression
-    || lastInputIsSpecialNumber || invalidDecimalPlacement)  {
+    || lastInputIsSpecialNumber || invalidDecimalPlacement || screen.textContent === errorMessage)  {
     return;
   }
 
@@ -195,8 +202,8 @@ function handleSpecialNumKeys(event) {
 }
 
 function handleOperatorKey(event) {
-  if (allowMiniScreenUpdate) {
-    expression = document.getElementById("bigger-text").textContent;
+  if (allowMiniScreenUpdate && screen.textContent !== errorMessage) {
+    expression = screen.textContent;
   }
 
   const operator = event.target.dataset.key;
@@ -253,34 +260,27 @@ function keyboardShortcuts(event) {
     key = "C";
   }
 
-  const button = document.querySelector(`button[data-key="${key}"]`);
+  const button = getButtonByKey(key);
   if (!button) return;
 
   button.click();
 }
 
 window.addEventListener("DOMContentLoaded", event => {
-  const numKeys = document.querySelectorAll("button.number");
+  window.addEventListener("keydown", keyboardShortcuts);
+  equalBtn.addEventListener("click", handleEqualButton);
+  deleteBtn.addEventListener("click", handleDelete);
+  resetBtn.addEventListener("click", handleReset);
+
   numKeys.forEach(numKey => numKey.addEventListener("click", handleNumKeys));
 
   specialNums.forEach(specialNum => {
-    const buttonRef = document.querySelector(`button[data-key="${specialNum}"]`);
+    const buttonRef = getButtonByKey(specialNum);
     buttonRef.addEventListener("click", handleSpecialNumKeys);
   });
 
-  const deleteBtn = document.querySelector("button.delete");
-  deleteBtn.addEventListener("click", handleDelete);
-
-  const resetBtn = document.querySelector("button.reset");
-  resetBtn.addEventListener("click", handleReset);
-
   operators.forEach(operator => {
-    const buttonRef = document.querySelector(`button[data-key="${operator}"]`);
+    const buttonRef = getButtonByKey(operator);
     buttonRef.addEventListener("click", handleOperatorKey);
   });
-
-  const equalBtn = document.querySelector("button.equal");
-  equalBtn.addEventListener("click", handleEqualButton);
-
-  window.addEventListener("keydown", keyboardShortcuts);
 });
