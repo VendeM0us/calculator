@@ -94,7 +94,6 @@ function precedence(operator) {
 }
 
 function isOperand(ele) {
-  const operators = "*/+-";
   return !operators.includes(ele);
 }
 
