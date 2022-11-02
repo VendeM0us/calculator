@@ -168,4 +168,7 @@ button.divide, button.subtract, button.add, button.multiply, button.equal {
   #screen {
     max-width: 290px;
   }
+  #bigger-text {
+    font-size: 35px;
+  }
 }
