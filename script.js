@@ -57,11 +57,8 @@ function computeFromPostfixOrder(postfixOrder) {
     }
   }
 
-  if (stack[0] > -Infinity && stack[0] < Infinity) {
-    return stack[0];
-  } else {
-    return errorMessage;
-  }
+  const computed = stack[0];
+  return (computed > -Infinity && computed < Infinity) ? computed : errorMessage;
 }
 
 function translateToPostfixOrder(expression) {
