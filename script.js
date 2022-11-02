@@ -86,7 +86,7 @@ function isOperand(ele) {
 }
 
 function precise(num) {
-  const toPrecised = num.toFixed(12);
+  const toPrecised = num.toPrecision(12);
   return Number(toPrecised);
 }
 
@@ -147,6 +147,11 @@ function updateMiniScreen() {
   isNaN(Number(bigScreenTextHistory))
     ? miniScreen.innerText = bigScreenTextHistory
     : miniScreen.innerText = "Ans = " + bigScreenTextHistory;
+}
+
+function clearMiniScreen() {
+  const miniScreen = document.getElementById("smaller-text");
+  miniScreen.innerText = "";
 }
 
 function handleNumKeys(event) {
@@ -225,7 +230,7 @@ function handleDelete() {
 }
 
 function handleReset() {
-  updateMiniScreen();
+  clearMiniScreen();
   allowMiniScreenUpdate = false;
   expression = "";
   updateScreen();
