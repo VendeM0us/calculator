@@ -99,10 +99,7 @@ function isOperand(ele) {
 }
 
 function precise(num) {
-  let toPrecised = num.toFixed(8);
-  if (toPrecised.length >= 12) {
-    toPrecised = parseFloat(toPrecised).toPrecision(11);
-  }
+  let toPrecised = num.toPrecision(11);
   return Number(toPrecised);
 }
 
